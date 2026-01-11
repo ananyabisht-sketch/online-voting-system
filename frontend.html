@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Voting System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #667eea; }
+            to { text-shadow: 0 0 20px #fff, 0 0 30px #667eea, 0 0 40px #764ba2; }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .candidate-list {
+            margin-top: 20px;
+        }
+
+        .candidate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .voter-section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            font-size: 1.2rem;
+        }
+
+        .winner {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(255,107,107,0.4);
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fff, #f0f8ff);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .stage-indicator {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 10px; }
+            .section { padding: 20px; }
+            .result-item { flex-direction: column; text-align: center; gap: 10px; }
+            .progress-bar { width: 100%; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗳️ VOTE NOW</h1>
+        <p class="subtitle">Secure • Fast • Transparent Election Platform</p>
+
+        <div id="setupSection" class="section">
+            <div class="stage-indicator">👥 Step 1: Setup Candidates</div>
+            <div class="input-group">
+                <label for="candidateCount">Number of Candidates (1-10):</label>
+                <input type="number" id="candidateCount" min="1" max="10" value="3">
+            </div>
+            <div id="candidatesList" class="candidate-list"></div>
+            <button onclick="addCandidate()">➕ Add Candidate</button>
+            <button onclick="proceedToVoting()" style="margin-left: 10px; background: linear-gradient(45deg, #00b894, #00cec9);">✅ Proceed to Voting</button>
+        </div>
+
+        <div id="votingSection" class="section voter-section hidden">
+            <div class="stage-indicator">🗳️ Step 2: Cast Votes</div>
+            <div class="input-group">
+                <label for="votersCount">Number of Voters:</label>
+                <input type="number" id="votersCount" min="1" value="5">
+            </div>
+            <div id="currentVoter"></div>
+            <div id="voteOptions"></div>
+            <button id="voteBtn" onclick="castVote()">🗳️ Submit Vote</button>
+            <button onclick="finishVoting()" style="margin-left: 10px; background: linear-gradient(45deg, #fdcb6e, #e17055);">🏁 Finish All Votes</button>
+        </div>
+
+        <div id="resultsSection" class="section results hidden">
+            <div class="stage-indicator">🏆 Step 3: Final Results</div>
+            <div id="resultsList"></div>
+        </div>
+    </div>
+
+    <script>
+        let candidates = [];
+        let candidateCount = 0;
+        let currentVoter = 0;
+        let votersCount = 0;
+
+        function addCandidate() {
+            const name = prompt('Enter candidate name:');
+            if (name && candidates.length < 10) {
+                candidates.push({ name, votes: 0 });
+                renderCandidatesList();
+            }
+        }
+
+        function renderCandidatesList() {
+            const list = document.getElementById('candidatesList');
+            list.innerHTML = '';
+            candidates.forEach((cand, index) => {
+                const div = document.createElement('div');
+                div.className = 'candidate-item';
+                div.innerHTML = `<strong>${cand.name}</strong> <small>New Candidate</small>`;
+                list.appendChild(div);
+            });
+        }
+
+        function proceedToVoting() {
+            candidateCount = parseInt(document.getElementById('candidateCount').value);
+            if (candidates.length !== candidateCount) {
+                alert(`Please add exactly ${candidateCount} candidates.`);
+                return;
+            }
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('votingSection').classList.remove('hidden');
+            document.getElementById('votingSection').classList.add('active');
+        }
+
+        function renderVoteOptions() {
+            const options = document.getElementById('voteOptions');
+            options.innerHTML = '<h3>Choose Candidate:</h3>';
+            candidates.forEach((cand, index) => {
+                const btn = document.createElement('button');
+                btn.innerHTML = `${index + 1}. ${cand.name}`;
+                btn.style.margin = '5px';
+                btn.style.background = '#667eea';
+                btn.onclick = () => selectChoice(index + 1);
+                options.appendChild(btn);
+            });
+        }
+
+        function selectChoice(choice) {
+            candidates[choice - 1].votes++;
+            currentVoter++;
+            if (currentVoter < votersCount) {
+                showCurrentVoter();
+            } else {
+                showResults();
+            }
+        }
+
+        function showCurrentVoter() {
+            document.getElementById('currentVoter').innerHTML = `
+                <div class="stage-indicator">Voter ${currentVoter + 1} / ${votersCount}</div>
+            `;
+            renderVoteOptions();
+        }
+
+        function finishVoting() {
+            votersCount = parseInt(document.getElementById('votersCount').value);
+            currentVoter = 0;
+            document.getElementById('currentVoter').innerHTML = `
+                <div class="stage-indicator">Starting Voting... ${votersCount} voters</div>
+            `;
+            showCurrentVoter();
+        }
+
+        function showResults() {
+            document.getElementById('votingSection').classList.add('hidden');
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('active');
+
+            const list = document.getElementById('resultsList');
+            list.innerHTML = '';
+
+            let maxVotes = 0;
+            let winnerIndex = -1;
+
+            candidates.forEach((cand, index) => {
+                if (cand.votes > maxVotes) {
+                    maxVotes = cand.votes;
+                    winnerIndex = index;
+                }
+            });
+
+            candidates.forEach((cand, index) => {
+                const div = document.createElement('div');
+                div.className = 'result-item' + (index === winnerIndex ? ' winner' : '');
+                const percentage = candidates.length > 0 ? (cand.votes / votersCount * 100).toFixed(1) : 0;
+                div.innerHTML = `
+                    <span>${cand.name}</span>
+                    <div>
+                        <span>${cand.votes} votes (${percentage}%)</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            if (winnerIndex !== -1) {
+                const winnerMsg = document.createElement('div');
+                winnerMsg.innerHTML = `<h2 style="text-align:center;color:#ff6b6b;font-family:'Orbitron';">🎉 Winner: ${candidates[winnerIndex].name} 🎉</h2>`;
+                list.appendChild(winnerMsg);
+            }
+        }
+
+        // Initial add some demo candidates
+        window.onload = function() {
+            for(let i=0; i<3; i++) {
+                candidates.push({name: `Candidate ${i+1}`, votes: 0});
+            }
+            renderCandidatesList();
+        };
+    </script>
+</body>
+</html>
